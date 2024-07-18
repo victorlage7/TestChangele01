@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Google Drive\\POS FIAP 2024\\Modulo 1\\TesteChalenge\\fiap_arq_sistemas_14\\Tech_Challenge1\\TechChallenge1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2A78E439-0C9B-4DB0-9F24-3BC0EE5179B2}|WebApi\\WebApi.csproj|d:\\google drive\\pos fiap 2024\\modulo 1\\testechalenge\\fiap_arq_sistemas_14\\tech_challenge1\\techchallenge1\\webapi\\domain\\enums\\emailaddresstype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A78E439-0C9B-4DB0-9F24-3BC0EE5179B2}|WebApi\\WebApi.csproj|solutionrelative:webapi\\domain\\enums\\emailaddresstype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A78E439-0C9B-4DB0-9F24-3BC0EE5179B2}|WebApi\\WebApi.csproj|d:\\google drive\\pos fiap 2024\\modulo 1\\testechalenge\\fiap_arq_sistemas_14\\tech_challenge1\\techchallenge1\\webapi\\domain\\enums\\phonenumbertype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A78E439-0C9B-4DB0-9F24-3BC0EE5179B2}|WebApi\\WebApi.csproj|solutionrelative:webapi\\domain\\enums\\phonenumbertype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "EmailAddressType.cs",
+              "DocumentMoniker": "D:\\Google Drive\\POS FIAP 2024\\Modulo 1\\TesteChalenge\\fiap_arq_sistemas_14\\Tech_Challenge1\\TechChallenge1\\WebApi\\Domain\\Enums\\EmailAddressType.cs",
+              "RelativeDocumentMoniker": "WebApi\\Domain\\Enums\\EmailAddressType.cs",
+              "ToolTip": "D:\\Google Drive\\POS FIAP 2024\\Modulo 1\\TesteChalenge\\fiap_arq_sistemas_14\\Tech_Challenge1\\TechChallenge1\\WebApi\\Domain\\Enums\\EmailAddressType.cs",
+              "RelativeToolTip": "WebApi\\Domain\\Enums\\EmailAddressType.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-17T00:02:51.544Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PhoneNumberType.cs",
+              "DocumentMoniker": "D:\\Google Drive\\POS FIAP 2024\\Modulo 1\\TesteChalenge\\fiap_arq_sistemas_14\\Tech_Challenge1\\TechChallenge1\\WebApi\\Domain\\Enums\\PhoneNumberType.cs",
+              "RelativeDocumentMoniker": "WebApi\\Domain\\Enums\\PhoneNumberType.cs",
+              "ToolTip": "D:\\Google Drive\\POS FIAP 2024\\Modulo 1\\TesteChalenge\\fiap_arq_sistemas_14\\Tech_Challenge1\\TechChallenge1\\WebApi\\Domain\\Enums\\PhoneNumberType.cs",
+              "RelativeToolTip": "WebApi\\Domain\\Enums\\PhoneNumberType.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-17T00:02:49.948Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
