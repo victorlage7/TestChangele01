@@ -40,3 +40,8 @@ await app.MigrateDatabaseAsync();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{
+    // Expose the Program class for use with WebApplicationFactory<T>
+}
