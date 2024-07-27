@@ -14,11 +14,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
+    - name: Exibir verseão DOtnet
+      run: dotnet --version
         
     - name: Restore dependencies
       run: dotnet restore
