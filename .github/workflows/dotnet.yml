@@ -20,7 +20,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Exibir verseão DOtnet
+    - name: Exibir verseão Dotnet
       run: dotnet --version
         
     - name: Restore dependencies
