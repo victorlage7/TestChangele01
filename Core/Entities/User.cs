@@ -1,6 +1,6 @@
-using WebApi.Domain.Enums;
+using Core.Enums;
 
-namespace WebApi.Domain.Entities;
+namespace Core.Entities;
 
 public class User
 {

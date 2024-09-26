@@ -1,4 +1,4 @@
-namespace WebApi.Dtos;
+namespace Core.Dtos;
 
 public class UserLoginDto
 {

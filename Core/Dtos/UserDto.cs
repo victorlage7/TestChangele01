@@ -1,6 +1,6 @@
-using WebApi.Domain.Enums;
+using Core.Enums;
 
-namespace WebApi.Dtos;
+namespace Core.Dtos;
 
 public class UserDto
 {

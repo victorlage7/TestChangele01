@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace WebApi.Domain.Enums;
+namespace Core.Enums;
 
 public enum EmailAddressType
 {

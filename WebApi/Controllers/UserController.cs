@@ -1,12 +1,10 @@
+using Core.Dtos;
+using Core.Entities;
 using Messaging.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RabbitMQ.Client;
 using System.Text;
-using System.Threading.Channels;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Interfaces.Repositories;
-using WebApi.Dtos;
 
 namespace WebApi.Controllers;
 

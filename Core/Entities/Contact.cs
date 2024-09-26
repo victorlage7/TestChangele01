@@ -4,7 +4,7 @@ using WebApi.Domain.ValueObjects;
 
 // ReSharper disable All
 
-namespace WebApi.Domain.Entities
+namespace Core.Entities
 {
     public class Contact
     {

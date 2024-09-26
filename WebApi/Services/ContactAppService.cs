@@ -1,6 +1,6 @@
+using Core.Entities;
 using System.ComponentModel.DataAnnotations;
 using WebApi.Domain;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Interfaces.Repositories;
 using WebApi.Domain.Interfaces.Services;
 using WebApi.Domain.Requests;

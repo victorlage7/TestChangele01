@@ -1,10 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Core.Dtos;
 using Microsoft.IdentityModel.Tokens;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Interfaces.Repositories;
-using WebApi.Dtos;
 using WebApi.Interfaces;
 
 namespace WebApi.Services;

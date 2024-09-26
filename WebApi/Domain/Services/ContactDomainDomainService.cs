@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using WebApi.Domain.Entities;
+﻿using Core.Entities;
 using WebApi.Domain.Interfaces.Repositories;
 using WebApi.Domain.Interfaces.Services;
 

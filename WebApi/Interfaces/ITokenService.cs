@@ -1,5 +1,4 @@
-using WebApi.Domain.Entities;
-using WebApi.Dtos;
+using Core.Dtos;
 
 namespace WebApi.Interfaces;
 

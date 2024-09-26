@@ -1,12 +1,12 @@
 using Moq;
 using WebApi.Interfaces;
 using WebApi.ViewModels;
-using WebApi.Domain.Enums;
 using WebApi.Domain;
 using WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Domain.Requests;
 using System.ComponentModel.DataAnnotations;
+using Core.Enums;
 
 namespace WebApiTest.Controllers;
 

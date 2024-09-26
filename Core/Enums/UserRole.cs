@@ -1,4 +1,4 @@
-namespace WebApi.Domain.Enums;
+namespace Core.Enums;
 
 public enum UserRole
 {

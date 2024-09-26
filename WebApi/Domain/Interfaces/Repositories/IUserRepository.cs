@@ -1,5 +1,5 @@
-using WebApi.Domain.Entities;
-using WebApi.Dtos;
+using Core.Dtos;
+using Core.Entities;
 
 namespace WebApi.Domain.Interfaces.Repositories;
 
