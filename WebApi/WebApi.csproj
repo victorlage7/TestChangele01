@@ -26,22 +26,22 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Infrastructure\Interfaces\" />
-    </ItemGroup>
-
-    <ItemGroup>
+        <Compile Remove="Infrastructure\Interfaces\**" />
         <Compile Remove="RequestAll\**" />
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Remove="Infrastructure\Interfaces\**" />
         <EmbeddedResource Remove="RequestAll\**" />
     </ItemGroup>
 
     <ItemGroup>
+        <Content Remove="Infrastructure\Interfaces\**" />
         <Content Remove="RequestAll\**" />
     </ItemGroup>
 
     <ItemGroup>
+        <None Remove="Infrastructure\Interfaces\**" />
         <None Remove="RequestAll\**" />
     </ItemGroup>
 
