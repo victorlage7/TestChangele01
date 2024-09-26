@@ -1,6 +1,5 @@
 using Messaging;
 using Messaging.Interface;
-using System.Configuration;
 using WebApi.Interfaces;
 using WebApi.Services;
 
