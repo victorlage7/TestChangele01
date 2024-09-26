@@ -4,6 +4,8 @@ using Microsoft.OpenApi.Models;
 using WebApi.Infrastructure;
 using WebApi.Domain;
 using WebApi.Infrastructure.Context;
+using Messaging;
+using System.Configuration;
 
 namespace WebApi;
 
@@ -58,7 +60,9 @@ public class Startup
 
         services.AddDbContext<TechChallenge1DbContext>(
             optBuilder => { optBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")); });
-
+        
+        services.Configure<RabbitMqConfiguration>(a => _configuration.GetSection(nameof(RabbitMqConfiguration)).Bind(a));
+        
         services.AddRepositories();
         services.AddAppServices();
         services.AddDomainServices();

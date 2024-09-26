@@ -1,5 +1,9 @@
+using Messaging.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
+using System.Text;
+using System.Threading.Channels;
 using WebApi.Domain.Entities;
 using WebApi.Domain.Interfaces.Repositories;
 using WebApi.Dtos;
@@ -12,9 +16,15 @@ public class UserController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
 
-    public UserController(IUserRepository userRepository)
+    private readonly IRabbitMqService _rabbitMqService;
+
+    private readonly IConfiguration _configuration;
+
+    public UserController(IUserRepository userRepository, IConfiguration configuration, IRabbitMqService rabbitMqService)
     {
         _userRepository = userRepository;
+        _configuration = configuration;
+        _rabbitMqService = rabbitMqService;
     }
     
     /// <summary>
@@ -89,6 +99,29 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUsersAsync()
     {
         var users = await _userRepository.GetAllAsync();
+
+
+        using var connection = _rabbitMqService.CreateChannel();
+
+        using (var model = connection.CreateModel())
+        {
+           model.QueueDeclare(
+           queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUserGetUsersAsync"),
+           durable: false,
+           exclusive: false,
+           autoDelete: false,
+           arguments: null);
+
+           var body = Encoding.UTF8.GetBytes("Hi " + DateTime.Now.ToString());
+
+           model.BasicPublish(exchange: "",
+                        routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUserGetUsersAsync"),
+                        mandatory: false,
+                        basicProperties: null,
+                        body: body
+                        );
+        }
+
         if (!users.Any())
             return NotFound("Nenhum usuário encontrado.");
         

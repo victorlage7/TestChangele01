@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WebApi.Domain.ValueObjects;
 
+
 // ReSharper disable All
 
 namespace WebApi.Domain.Entities

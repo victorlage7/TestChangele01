@@ -1,3 +1,6 @@
+using Messaging;
+using Messaging.Interface;
+using System.Configuration;
 using WebApi.Interfaces;
 using WebApi.Services;
 
@@ -9,6 +12,8 @@ public static class DependencyInjection
     {
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IContactAppService, ContactAppService>();
-       
+
+        services.AddSingleton<IRabbitMqService, RabbitMqService>();
+
     }
 }
