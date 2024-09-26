@@ -105,7 +105,7 @@ public class UserController : ControllerBase
         {
            model.QueueDeclare(
            queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUserGetUsersAsync"),
-           durable: false,
+           durable: true,
            exclusive: false,
            autoDelete: false,
            arguments: null);
