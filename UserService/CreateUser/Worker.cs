@@ -12,10 +12,6 @@ namespace CreateUser
 
         private readonly IRabbitMqService _rabbitMqService;
 
-        //private readonly RabbitMqConfiguration _connfig;
-
-        //private readonly IConfiguration _configuration;
-
         public Worker(ILogger<Worker> logger, IRabbitMqService rabbitMqService )
         {
             _logger = logger;
@@ -36,6 +32,8 @@ namespace CreateUser
                         , CreateUserHelper.GetSetting("Password")
                         , CreateUserHelper.GetSetting("Hostname")
                         , Int32.Parse(CreateUserHelper.GetSetting("Port")));
+
+
                     using var channel = connection.CreateModel();
 
                     channel.QueueDeclare(queue: CreateUserHelper.GetSetting("QueueNameCreateUser"),
@@ -55,6 +53,7 @@ namespace CreateUser
                         await Task.CompletedTask;
                         channel.BasicAck(ea.DeliveryTag, false);
                     };
+
 
                     channel.BasicConsume(
                     queue: CreateUserHelper.GetSetting("QueueNameCreateUser"),
