@@ -25,5 +25,20 @@ namespace Messaging
             var channel = connection.CreateConnection();
             return channel;
         }
+
+        public IConnection CreateChannel(string username, string password, string hostName, int port)
+        {
+            ConnectionFactory connection = new ConnectionFactory()
+            {
+                UserName = username,
+                Password = password,
+                HostName = hostName,
+                Port = port
+            };
+
+            connection.DispatchConsumersAsync = true;
+            var channel = connection.CreateConnection();
+            return channel;
+        }
     }
 }

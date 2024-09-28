@@ -1,9 +1,8 @@
-using Messaging;
+using Core.Entities;
 using Messaging.Interface;
-using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Text;
+using System.Text.Json;
 
 namespace CreateUser
 {
@@ -17,7 +16,7 @@ namespace CreateUser
 
         //private readonly IConfiguration _configuration;
 
-        public Worker(ILogger<Worker> logger, IRabbitMqService rabbitMqService)
+        public Worker(ILogger<Worker> logger, IRabbitMqService rabbitMqService )
         {
             _logger = logger;
             _rabbitMqService = rabbitMqService;
@@ -32,36 +31,39 @@ namespace CreateUser
                 {
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
-
-                    _logger.LogInformation(CreateUserHelper.GetSetting("Hostname"));
-
-                    using var connection = _rabbitMqService.CreateChannel();
+                    using var connection = _rabbitMqService.CreateChannel(
+                        CreateUserHelper.GetSetting("UserName")
+                        , CreateUserHelper.GetSetting("Password")
+                        , CreateUserHelper.GetSetting("Hostname")
+                        , Int32.Parse(CreateUserHelper.GetSetting("Port")));
                     using var channel = connection.CreateModel();
 
-                    channel.QueueDeclare(queue: "UserQueueGetUsersAsync",
+                    channel.QueueDeclare(queue: CreateUserHelper.GetSetting("QueueNameCreateUser"),
                                    durable: true,
                                    exclusive: false,
                                    autoDelete: false,
                                    arguments: null);
 
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (sender, eventArgs) =>
+                    var consumer = new AsyncEventingBasicConsumer(channel);
+                    consumer.Received += async (ch, ea) =>
                     {
-                        var body = eventArgs.Body.ToArray();
-                        var message = Encoding.UTF8.GetString(body);
+                        var body = ea.Body.ToArray();
+                        var text = System.Text.Encoding.UTF8.GetString(body);
+                        var pedido = JsonSerializer.Deserialize<User>(body);
 
-                        //var pedido = JsonSerializer.Deserialize<Pedido>(body);
 
-                        Console.WriteLine(message?.ToString() + " Evento Processado.");
+                        await Task.CompletedTask;
+                        channel.BasicAck(ea.DeliveryTag, false);
                     };
 
                     channel.BasicConsume(
-                        
-                        queue: CreateUserHelper.GetSetting("QueueNameUserGetUsersAsync"),
-                        autoAck: true,
-                        consumer: consumer);
+                    queue: CreateUserHelper.GetSetting("QueueNameCreateUser"),
+                    autoAck: true,
+                    consumer: consumer);
                     await Task.Delay(2000, stoppingToken);
                 }
+
+
 
                 await Task.Delay(1000, stoppingToken);
             }
