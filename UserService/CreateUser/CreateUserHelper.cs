@@ -15,5 +15,10 @@
         {
             return _configuration[key];
         }
+
+        public static string GetConnectionString (string key)
+        { 
+            return _configuration.GetConnectionString(key);
+        }
     }
 }

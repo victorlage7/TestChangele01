@@ -4,6 +4,10 @@ namespace Core.Entities;
 
 public class User
 {
+    public User()
+    {
+    }
+
     public User(string username, string password, UserRole role)
     {
         Username = username;

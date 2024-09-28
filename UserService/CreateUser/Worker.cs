@@ -1,7 +1,9 @@
 using Core.Entities;
+using Dapper;
 using Messaging.Interface;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Data.SqlClient;
 using System.Text.Json;
 
 namespace CreateUser
@@ -16,7 +18,6 @@ namespace CreateUser
         {
             _logger = logger;
             _rabbitMqService = rabbitMqService;
-
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -25,6 +26,8 @@ namespace CreateUser
             {
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
+                    User user = new User();
+
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
                     using var connection = _rabbitMqService.CreateChannel(
@@ -32,7 +35,6 @@ namespace CreateUser
                         , CreateUserHelper.GetSetting("Password")
                         , CreateUserHelper.GetSetting("Hostname")
                         , Int32.Parse(CreateUserHelper.GetSetting("Port")));
-
 
                     using var channel = connection.CreateModel();
 
@@ -54,6 +56,12 @@ namespace CreateUser
                         channel.BasicAck(ea.DeliveryTag, false);
                     };
 
+                    using (var connectionsql = new SqlConnection(CreateUserHelper.GetConnectionString("DefaultConnection")))
+                    {
+                        var sql = "SELECT * FROM [TechChallenge1]..[User] WHERE Username = @UserName";
+                        var user = connectionsql.QueryFirstOrDefault<User>(sql, new { UserName = "qwe" });
+                        Console.WriteLine(user);
+                    }
 
                     channel.BasicConsume(
                     queue: CreateUserHelper.GetSetting("QueueNameCreateUser"),
@@ -61,8 +69,6 @@ namespace CreateUser
                     consumer: consumer);
                     await Task.Delay(2000, stoppingToken);
                 }
-
-
 
                 await Task.Delay(1000, stoppingToken);
             }
