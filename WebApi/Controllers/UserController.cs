@@ -4,6 +4,7 @@ using Messaging.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using System.Text.Json;
 using WebApi.Domain.Interfaces.Repositories;
 
 namespace WebApi.Controllers;
@@ -35,10 +36,31 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> AddUserAsync([FromBody] User user)
     {
-        if (!await _userRepository.AddAsync(user))
+        //if (!await _userRepository.AddAsync(user))
+        //{
+        //        return BadRequest("Usuário já existe.");
+        //}
+
+        using var connection = _rabbitMqService.CreateChannel();
+
+        using (var model = connection.CreateModel())
         {
-                return BadRequest("Usuário já existe.");
-        } 
+            model.QueueDeclare(
+            queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateUser"),
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null);
+
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<User>(user));
+
+            model.BasicPublish(exchange: "",
+                         routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateUser"),
+                         mandatory: false,
+                         basicProperties: null,
+                         body: body
+                         );
+        }
         return Ok("Usuário criado com sucesso!");
     }
     
@@ -97,28 +119,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUsersAsync()
     {
         var users = await _userRepository.GetAllAsync();
-
-
-        using var connection = _rabbitMqService.CreateChannel();
-
-        using (var model = connection.CreateModel())
-        {
-           model.QueueDeclare(
-           queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUserGetUsersAsync"),
-           durable: true,
-           exclusive: false,
-           autoDelete: false,
-           arguments: null);
-
-           var body = Encoding.UTF8.GetBytes("Hi " + DateTime.Now.ToString());
-
-           model.BasicPublish(exchange: "",
-                        routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUserGetUsersAsync"),
-                        mandatory: false,
-                        basicProperties: null,
-                        body: body
-                        );
-        }
 
         if (!users.Any())
             return NotFound("Nenhum usuário encontrado.");

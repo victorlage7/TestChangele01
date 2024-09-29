@@ -26,7 +26,7 @@ namespace CreateUser
             {
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
-                    User user = new User();
+                    User user = null;
 
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
@@ -49,19 +49,29 @@ namespace CreateUser
                     {
                         var body = ea.Body.ToArray();
                         var text = System.Text.Encoding.UTF8.GetString(body);
-                        var pedido = JsonSerializer.Deserialize<User>(body);
-
-
+                        user = JsonSerializer.Deserialize<User>(body);
                         await Task.CompletedTask;
                         channel.BasicAck(ea.DeliveryTag, false);
+
+                        if (user != null)
+                        {
+                            using (var connectionsql = new SqlConnection(CreateUserHelper.GetConnectionString("DefaultConnection")))
+                            {
+                                var sql = "INSERT INTO [TechChallenge1]..[User] (Id, Username, Password, Role) VALUES (@Id,@Username,@Password, @Role)";
+                                var newUser = new User(user.Id ,user.Username, user.Password, user.Role);
+                                var rowsAffected = connectionsql.Execute(sql, newUser);
+                                user = connectionsql.QueryFirstOrDefault<User>(sql, new { UserName = "qwe" });
+                                Console.WriteLine(user);
+                            }
+                        }
                     };
 
-                    using (var connectionsql = new SqlConnection(CreateUserHelper.GetConnectionString("DefaultConnection")))
-                    {
-                        var sql = "SELECT * FROM [TechChallenge1]..[User] WHERE Username = @UserName";
-                        var user = connectionsql.QueryFirstOrDefault<User>(sql, new { UserName = "qwe" });
-                        Console.WriteLine(user);
-                    }
+                    //using (var connectionsql = new SqlConnection(CreateUserHelper.GetConnectionString("DefaultConnection")))
+                    //{
+                    //    var sql = "SELECT * FROM [TechChallenge1]..[User] WHERE Username = @UserName";
+                    //    var user = connectionsql.QueryFirstOrDefault<User>(sql, new { UserName = "qwe" });
+                    //    Console.WriteLine(user);
+                    //}
 
                     channel.BasicConsume(
                     queue: CreateUserHelper.GetSetting("QueueNameCreateUser"),
