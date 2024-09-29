@@ -3,6 +3,7 @@ using Core.Entities;
 using Messaging.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using WebApi.Domain.Interfaces.Repositories;
@@ -36,30 +37,47 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> AddUserAsync([FromBody] User user)
     {
-        //if (!await _userRepository.AddAsync(user))
-        //{
-        //        return BadRequest("Usuário já existe.");
-        //}
+        User userResponse = null;
+        string urlApi = "https://localhost:7000/api/user"+ "?username="+user.Username;
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
 
-        using var connection = _rabbitMqService.CreateChannel();
-
-        using (var model = connection.CreateModel())
+        if (response.StatusCode == HttpStatusCode.OK)
         {
-            model.QueueDeclare(
-            queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateUser"),
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null);
+            var conteudo = await response.Content.ReadAsStringAsync();
+            userResponse = JsonSerializer.Deserialize<User>(conteudo);
+        }
+        else
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
 
-            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<User>(user));
+        if (userResponse != null)
+        {
+            return BadRequest("Usuário já existe.");
+        }
+        else 
+        {
+            using var connection = _rabbitMqService.CreateChannel();
 
-            model.BasicPublish(exchange: "",
-                         routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateUser"),
-                         mandatory: false,
-                         basicProperties: null,
-                         body: body
-                         );
+            using (var model = connection.CreateModel())
+            {
+                model.QueueDeclare(
+                queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateUser"),
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<User>(user));
+
+                model.BasicPublish(exchange: "",
+                             routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateUser"),
+                             mandatory: false,
+                             basicProperties: null,
+                             body: body
+                             );
+            }
         }
         return Ok("Usuário criado com sucesso!");
     }

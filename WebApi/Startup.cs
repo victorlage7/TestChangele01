@@ -5,7 +5,6 @@ using WebApi.Infrastructure;
 using WebApi.Domain;
 using WebApi.Infrastructure.Context;
 using Messaging;
-using System.Configuration;
 
 namespace WebApi;
 
