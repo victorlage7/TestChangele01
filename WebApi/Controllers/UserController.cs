@@ -91,8 +91,49 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> UpdateUserAsync([FromBody] User user)
     {
-        await _userRepository.UpdateAsync(user);
-        return Ok("Usuário atualizado com sucesso!");
+        User myObject = null;
+        string urlApi = "https://localhost:7000/api/user/" + user.Username;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            using var connection = _rabbitMqService.CreateChannel();
+
+            using (var model = connection.CreateModel())
+            {
+                model.QueueDeclare(
+                queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUpdateUser"),
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<User>(user));
+
+                model.BasicPublish(exchange: "",
+                             routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUpdateUser"),
+                             mandatory: false,
+                             basicProperties: null,
+                             body: body
+                             );
+            }
+            return Ok("Usuário Atualizado com sucesso!");
+        }
+        else if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+        else if (response.StatusCode == HttpStatusCode.OK)
+        {
+            return NoContent();
+        }
+        return BadRequest("Tente novamente mais tarde.");
+
     }
     
     /// <summary>
