@@ -3,6 +3,7 @@ using Core.Entities;
 using Messaging.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -104,27 +105,52 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> DeleteUserAsync(string username)
     {
-        using var connection = _rabbitMqService.CreateChannel();
 
-        using (var model = connection.CreateModel())
+        User myObject = null;
+        string urlApi = "https://localhost:7000/api/user/" + username;
+        var jsonOptions = new JsonSerializerOptions()
         {
-            model.QueueDeclare(
-            queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteUser"),
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null);
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
 
-            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(username));
-
-            model.BasicPublish(exchange: "",
-                         routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteUser"),
-                         mandatory: false,
-                         basicProperties: null,
-                         body: body
-                         );
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
         }
-        return Ok("Usuário deletado com sucesso!");
+        else if (response.StatusCode == HttpStatusCode.NoContent)
+        {
+            return NoContent();
+        }
+        else
+        {
+            var conteudo = await response.Content.ReadAsStringAsync();
+
+            myObject = JsonSerializer.Deserialize<User>(conteudo, jsonOptions);
+
+            using var connection = _rabbitMqService.CreateChannel();
+
+            using (var model = connection.CreateModel())
+            {
+                model.QueueDeclare(
+                queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteUser"),
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(myObject));
+
+                model.BasicPublish(exchange: "",
+                             routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteUser"),
+                             mandatory: false,
+                             basicProperties: null,
+                             body: body
+                             );
+            }
+            return Ok("Usuário deletado com sucesso!");
+        }
     }
     
     /// <summary>

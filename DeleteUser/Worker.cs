@@ -1,8 +1,10 @@
+using Core.Entities;
 using Dapper;
 using Messaging.Interface;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Data.SqlClient;
+using System.Text.Json;
 
 namespace DeleteUser
 {
@@ -24,6 +26,8 @@ namespace DeleteUser
             {
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
+                    User user = null;
+
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
                     using var connection = _rabbitMqService.CreateChannel(
@@ -44,18 +48,20 @@ namespace DeleteUser
                     consumer.Received += async (ch, ea) =>
                     {
                         var body = ea.Body.ToArray();
-                        string text = System.Text.Encoding.UTF8.GetString(body);
+                        var text = System.Text.Encoding.UTF8.GetString(body);
+                        user = JsonSerializer.Deserialize<User>(body);
                         await Task.CompletedTask;
                         channel.BasicAck(ea.DeliveryTag, false);
 
-                        if(text != null)
-
-                        using (var connectionsql = new SqlConnection(DeleteUserHelper.GetConnectionString("DefaultConnection")))
+                        if (user != null)
                         {
-                            var parameters = new { UserName = text };
-                            var sql = "DELETE FROM [TechChallenge1]..[User WHERE Username =@UserName";
-                            var result = connectionsql.Query(sql, parameters);
-                            Console.WriteLine();
+                            using (var connectionsql = new SqlConnection(DeleteUserHelper.GetConnectionString("DefaultConnection")))
+                            {
+                                var sql = "Delete [TechChallenge1]..[User] where Id = @Id";
+                                var parameter = new { Id = user.Id };
+                                var rowsAffected = connectionsql.Execute(sql, parameter);
+                                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                            }
                         }
                     };
 
