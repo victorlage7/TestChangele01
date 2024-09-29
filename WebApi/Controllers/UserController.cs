@@ -37,24 +37,22 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> AddUserAsync([FromBody] User user)
     {
-        User userResponse = null;
-        string urlApi = "https://localhost:7000/api/user"+ "?username="+user.Username;
+        User myObject = null;
+        string urlApi = "https://localhost:7000/api/user/"+user.Username;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
         var client = new HttpClient();
         var response = await client.GetAsync(urlApi);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            var conteudo = await response.Content.ReadAsStringAsync();
-            userResponse = JsonSerializer.Deserialize<User>(conteudo);
+            return BadRequest("Usuário já existe.");
         }
-        else
+        else if (!response.IsSuccessStatusCode)
         {
             return BadRequest("Tente novamente mais tarde.");
-        }
-
-        if (userResponse != null)
-        {
-            return BadRequest("Usuário já existe.");
         }
         else 
         {
@@ -78,8 +76,8 @@ public class UserController : ControllerBase
                              body: body
                              );
             }
-        }
         return Ok("Usuário criado com sucesso!");
+        }
     }
     
     /// <summary>
@@ -120,10 +118,22 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 404)]
     public async Task<IActionResult> GetUserAsync(string username)
     {
-        var user = await _userRepository.GetAsync(username);
-        if (user is null)
-            return NotFound("Usuário não encontrado.");
-        
+        User user = null;
+        string urlApi = "https://localhost:7000/api/user/"+username;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+        var conteudo = await response.Content.ReadAsStringAsync();
+        user = JsonSerializer.Deserialize<User>(conteudo, jsonOptions);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+
         return Ok(user);
     }
     
@@ -136,11 +146,25 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 404)] 
     public async Task<IActionResult> GetUsersAsync()
     {
-        var users = await _userRepository.GetAllAsync();
 
-        if (!users.Any())
-            return NotFound("Nenhum usuário encontrado.");
-        
+        List<User> users = new List<User>();
+
+        string urlApi = "https://localhost:7000/api/user/";
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+        users = JsonSerializer.Deserialize<List<User>>(conteudo, jsonOptions);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+
         return Ok(users);
     }
     
