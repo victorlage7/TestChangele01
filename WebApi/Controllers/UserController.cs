@@ -104,7 +104,26 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> DeleteUserAsync(string username)
     {
-        await _userRepository.DeleteAsync(username);
+        using var connection = _rabbitMqService.CreateChannel();
+
+        using (var model = connection.CreateModel())
+        {
+            model.QueueDeclare(
+            queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteUser"),
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null);
+
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(username));
+
+            model.BasicPublish(exchange: "",
+                         routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteUser"),
+                         mandatory: false,
+                         basicProperties: null,
+                         body: body
+                         );
+        }
         return Ok("Usuário deletado com sucesso!");
     }
     
