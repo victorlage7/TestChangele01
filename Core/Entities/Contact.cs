@@ -8,6 +8,13 @@ namespace Core.Entities
 {
     public class Contact
     {
+
+        public Contact()
+        {
+            EmailAddresses = new HashSet<EmailAddress>();
+            PhoneNumbers = new HashSet<PhoneNumber>();
+        }
+
         /// <summary>
         /// Construtor para a criação de um novo contato.
         /// </summary>

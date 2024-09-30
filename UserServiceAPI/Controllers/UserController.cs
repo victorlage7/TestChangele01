@@ -26,7 +26,6 @@ namespace UserServiceApi.Controllers
             {
                 var sql = "SELECT * FROM [TechChallenge1]..[User] WHERE Username = @UserName";
                 user = connectionsql.QueryFirstOrDefault<User>(sql, new { UserName = username });
-                Console.WriteLine(user);
             }
 
             return Ok(user);
@@ -42,7 +41,6 @@ namespace UserServiceApi.Controllers
             {
                 var sql = "SELECT * FROM [TechChallenge1]..[User]";
                 user = connectionsql.Query<User>(sql).ToList();
-                Console.WriteLine(user);
             }
 
             return Ok(user);

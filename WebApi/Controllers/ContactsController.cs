@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Messaging.Interface;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Domain.Requests;
 using WebApi.Interfaces;
 using WebApi.ViewModels;
@@ -14,9 +15,15 @@ public class ContactsController : ControllerBase
 {
     private readonly IContactAppService _contactAppService;
 
-    public ContactsController(IContactAppService contactAppService)
+    private readonly IRabbitMqService _rabbitMqService;
+
+    private readonly IConfiguration _configuration;
+
+    public ContactsController(IContactAppService contactAppService, IConfiguration configuration, IRabbitMqService rabbitMqService)
     {
         _contactAppService = contactAppService;
+        _configuration = configuration;
+        _rabbitMqService = rabbitMqService;
     }
 
     /// <summary>

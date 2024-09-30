@@ -34,6 +34,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteUser", "DeleteUser\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateUser", "UpdateUser\UpdateUser.csproj", "{032132ED-B3C1-47AB-840E-2DE46E4994D7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContactsService", "ContactsService", "{680F0DF1-FD41-440A-BC70-F175F9CAA115}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactServiceAPi", "ContactServiceAPi\ContactServiceAPi.csproj", "{365641E8-A4AC-49A6-82A5-5F1D0DD069C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +80,10 @@ Global
 		{032132ED-B3C1-47AB-840E-2DE46E4994D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{032132ED-B3C1-47AB-840E-2DE46E4994D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{032132ED-B3C1-47AB-840E-2DE46E4994D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{365641E8-A4AC-49A6-82A5-5F1D0DD069C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{365641E8-A4AC-49A6-82A5-5F1D0DD069C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{365641E8-A4AC-49A6-82A5-5F1D0DD069C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{365641E8-A4AC-49A6-82A5-5F1D0DD069C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +97,7 @@ Global
 		{C0F13C9A-550A-4603-AEBD-42BDBD206881} = {F17A5F95-6195-4346-809F-5F40C0499251}
 		{6E7B5E15-2367-4C68-B51D-233B48B798F2} = {F17A5F95-6195-4346-809F-5F40C0499251}
 		{032132ED-B3C1-47AB-840E-2DE46E4994D7} = {F17A5F95-6195-4346-809F-5F40C0499251}
+		{365641E8-A4AC-49A6-82A5-5F1D0DD069C6} = {680F0DF1-FD41-440A-BC70-F175F9CAA115}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DFB00897-0038-4A91-83AF-00C2DDCC8022}
