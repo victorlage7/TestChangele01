@@ -1,7 +1,6 @@
 ﻿using Core.Entities;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
 namespace ContactServiceAPi.Controllers
@@ -25,7 +24,7 @@ namespace ContactServiceAPi.Controllers
             using (var connectionsql = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 var sql = "SELECT * FROM [TechChallenge1]..[Contact] WHERE ContactId = @ContactId";
-                contact = connectionsql.QueryFirstOrDefault<Contact>(sql, new { UserName = contactId });
+                contact = connectionsql.QueryFirstOrDefault<Contact>(sql, new { ContactId = contactId });
             }
 
             return Ok(contact);

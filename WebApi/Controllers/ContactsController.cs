@@ -26,6 +26,11 @@ public class ContactsController : ControllerBase
         _rabbitMqService = rabbitMqService;
     }
 
+    public ContactsController(IContactAppService contactAppService)
+    {
+        _contactAppService = contactAppService;
+    }
+
     /// <summary>
     /// Inclui um novo contato.
     /// </summary>
