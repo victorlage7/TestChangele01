@@ -1,5 +1,7 @@
-﻿using Messaging.Interface;
+﻿using Core.Entities;
+using Messaging.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using WebApi.Domain.Requests;
 using WebApi.Interfaces;
 using WebApi.ViewModels;
@@ -24,11 +26,6 @@ public class ContactsController : ControllerBase
         _contactAppService = contactAppService;
         _configuration = configuration;
         _rabbitMqService = rabbitMqService;
-    }
-
-    public ContactsController(IContactAppService contactAppService)
-    {
-        _contactAppService = contactAppService;
     }
 
     /// <summary>
@@ -69,6 +66,27 @@ public class ContactsController : ControllerBase
             return Ok(result);
 
         return NotFound("Contato não localizado");
+
+        //List<Contact> contacts = new List<Contact>();
+
+        //string urlApi = "https://localhost:7011/api/Contact/";
+        //var jsonOptions = new JsonSerializerOptions()
+        //{
+        //    PropertyNameCaseInsensitive = true
+        //};
+        //var client = new HttpClient();
+        //var response = await client.GetAsync(urlApi);
+
+        //var conteudo = await response.Content.ReadAsStringAsync();
+        //contacts = JsonSerializer.Deserialize<List<Contact>>(conteudo, jsonOptions);
+
+        //if (!response.IsSuccessStatusCode)
+        //{
+        //    return BadRequest("Tente novamente mais tarde.");
+        //}
+
+        //return Ok(contacts);
+
     }
 
     /// <summary>
@@ -82,12 +100,32 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 404)]
     public async Task<IActionResult> GetByContactIdAsync(Guid contactId)
     {
-        var result = await _contactAppService.GetByContactIdAsync(contactId);
+        //var result = await _contactAppService.GetByContactIdAsync(contactId);
 
-        if (result is not null)
-            return Ok(result);
+        //if (result is not null)
+        //    return Ok(result);
 
-        return NotFound("Contato não localizado");
+        //return NotFound("Contato não localizado");
+
+        Contact contact = new Contact();
+
+        string urlApi = "https://localhost:7011/api/Contact/"+contactId;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+        contact = JsonSerializer.Deserialize<Contact>(conteudo, jsonOptions);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+
+        return Ok(contact);
     }
 
 

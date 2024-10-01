@@ -7,12 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.Domain.Requests;
 using System.ComponentModel.DataAnnotations;
 using Core.Enums;
+using Messaging.Interface;
+using Microsoft.Extensions.Configuration;
 
 namespace WebApiTest.Controllers;
 
 public class ContactsControllerTest
 {
     private Mock<IContactAppService> _contactAppServiceMock;
+    private readonly Mock<IRabbitMqService> _rabbitMqService;
+
+    private readonly Mock<IConfiguration> _configuration;
+
     private ContactsController _controllerMock;
     private readonly ContactViewModel _invalidContactViewModel = new();
 
@@ -31,7 +37,7 @@ public class ContactsControllerTest
     public void Setup()
     {
         _contactAppServiceMock = new Mock<IContactAppService>();
-        _controllerMock = new ContactsController(_contactAppServiceMock.Object);
+        _controllerMock = new ContactsController(_contactAppServiceMock.Object, _configuration.Object, _rabbitMqService.Object);
     }
 
     [Test]
