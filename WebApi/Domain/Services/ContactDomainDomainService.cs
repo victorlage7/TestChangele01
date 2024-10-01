@@ -36,14 +36,16 @@ public class ContactDomainDomainService : IContactDomainService
                 ValidationResults = validationResults
             };
         }
-        else
-        {
-            await _contactRepository.AddAsync(contact);
-            return new ResultValidation
-            {
-                Object = contact
-            };
-        }
+        //else
+        //{
+        //    await _contactRepository.AddAsync(contact);
+        //    return new ResultValidation
+        //    {
+        //        Object = contact
+        //    };
+        //}
+
+        return null;
     }
 
     /// <summary>

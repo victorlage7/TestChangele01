@@ -1,6 +1,8 @@
 ﻿using Core.Entities;
 using Messaging.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text;
 using System.Text.Json;
 using WebApi.Domain.Requests;
 using WebApi.Interfaces;
@@ -44,9 +46,38 @@ public class ContactsController : ControllerBase
         if (resultValidation.ValidationResults.Any())
             return BadRequest(resultValidation.ValidationResults);
         else
-            return resultValidation.Object is not null
-                ? Ok((ContactViewModel)resultValidation.Object)
-                : BadRequest("Falha ao incluir o contato...");
+        {
+            {
+                using var connection = _rabbitMqService.CreateChannel();
+
+                using (var model = connection.CreateModel())
+                {
+                    model.QueueDeclare(
+                    queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateContact"),
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+
+                    var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<ContactViewModel>(contactViewModel));
+
+                    model.BasicPublish(exchange: "",
+                                 routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateContact"),
+                                 mandatory: false,
+                                 basicProperties: null,
+                                 body: body
+                                 );
+                }
+                return Ok((ContactViewModel)resultValidation.Object);
+            }
+        }
+
+        //if (resultValidation.ValidationResults.Any())
+        //    return BadRequest(resultValidation.ValidationResults);
+        //else
+        //    return resultValidation.Object is not null
+        //        ? Ok((ContactViewModel)resultValidation.Object)
+        //        : BadRequest("Falha ao incluir o contato...");
     }
 
     /// <summary>

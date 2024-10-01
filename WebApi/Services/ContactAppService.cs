@@ -89,15 +89,15 @@ public class ContactAppService : IContactAppService
 
         var resulValidation = await _contactDomainService.AddAsync(newContact);
 
-        if (resulValidation.Object is null) return resulValidation;
+        if (resulValidation is not null && resulValidation.Object is null) return resulValidation;
 
-        var contact = (Contact)resulValidation.Object;
+        //var contact = (Contact)resulValidation.Object;
 
-        var newContactViewModel = new ContactViewModel(contactId: contact.ContactId, name: contact.Name,
-            phoneNumbers: contact.PhoneNumbers.Select(phone =>
+        var newContactViewModel = new ContactViewModel(contactId: newContact.ContactId, name: newContact.Name,
+            phoneNumbers: newContact.PhoneNumbers.Select(phone =>
                 new PhoneNumberViewModel(type: phone.Type, countryCode: phone.CountryCode,
                     areaCode: phone.AreaCode, number: phone.Number)),
-            emailAddresses: contact.EmailAddresses.Select(email =>
+            emailAddresses: newContact.EmailAddresses.Select(email =>
                 new EmailAddressViewModel(type: email.Type, address: email.Address)));
 
         return new ResultValidation
