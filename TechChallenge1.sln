@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactServiceAPi", "Contac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateContact", "CreateContact\CreateContact.csproj", "{16D5400C-18B4-41A4-B3F4-534A7824932C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactCore", "ContactCore\ContactCore.csproj", "{C117CDEC-838F-47F7-88AC-9AD7D3E92FB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,10 @@ Global
 		{16D5400C-18B4-41A4-B3F4-534A7824932C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16D5400C-18B4-41A4-B3F4-534A7824932C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16D5400C-18B4-41A4-B3F4-534A7824932C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C117CDEC-838F-47F7-88AC-9AD7D3E92FB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C117CDEC-838F-47F7-88AC-9AD7D3E92FB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C117CDEC-838F-47F7-88AC-9AD7D3E92FB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C117CDEC-838F-47F7-88AC-9AD7D3E92FB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +111,7 @@ Global
 		{032132ED-B3C1-47AB-840E-2DE46E4994D7} = {F17A5F95-6195-4346-809F-5F40C0499251}
 		{365641E8-A4AC-49A6-82A5-5F1D0DD069C6} = {680F0DF1-FD41-440A-BC70-F175F9CAA115}
 		{16D5400C-18B4-41A4-B3F4-534A7824932C} = {680F0DF1-FD41-440A-BC70-F175F9CAA115}
+		{C117CDEC-838F-47F7-88AC-9AD7D3E92FB9} = {680F0DF1-FD41-440A-BC70-F175F9CAA115}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DFB00897-0038-4A91-83AF-00C2DDCC8022}
