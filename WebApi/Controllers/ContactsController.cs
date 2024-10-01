@@ -245,8 +245,56 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 404)]
     public async Task<IActionResult> DeleteContactAsync(Guid contactId)
     {
-        var result = await _contactAppService.DeleteAsync(contactId);
+        Contact contact = new Contact();
 
-        return result ? Ok("Contato excluído com sucesso...") : NotFound("Contato não localizado");
+        string urlApi = "https://localhost:7011/api/Contact/" + contactId;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+        contact = JsonSerializer.Deserialize<Contact>(conteudo, jsonOptions);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        { 
+            NotFound("Contato não localizado");
+        }
+        else if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+        else
+        {
+            using var connection = _rabbitMqService.CreateChannel();
+
+            using (var model = connection.CreateModel())
+            {
+                model.QueueDeclare(
+                queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteContact"),
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(contact));
+
+                model.BasicPublish(exchange: "",
+                             routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteContact"),
+                             mandatory: false,
+                             basicProperties: null,
+                             body: body
+                             );
+            }
+            return Ok("Usuário deletado com sucesso!");
+        }
+
+        return BadRequest("Tente novamente mais tarde.");
+
+        //var result = await _contactAppService.DeleteAsync(contactId);
+
+        //return result ? Ok("Contato excluído com sucesso...") : NotFound("Contato não localizado");
     }
 }

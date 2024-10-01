@@ -57,14 +57,14 @@ namespace DeleteContact
                             {
                                 using (var connectionsql = new SqlConnection(ContactUserHelper.GetConnectionString("DefaultConnection")))
                                 {
-                                    var sql = "Delte from [TechChallenge1]..[Contact] where ContactId = @ContactId";
+                                    var sql = "delete from [TechChallenge1]..[Contact] where ContactId = @ContactId";
                                     var newRow = new { ContactId = contact.ContactId, };
                                     var rowsAffected = connectionsql.Execute(sql, newRow);
 
-                                    var sqlAddress = "Delte from [ContactEmails]..[Contact] where ContactId = @ContactId";
+                                    var sqlAddress = "delete from [ContactEmails]..[Contact] where ContactId = @ContactId";
                                     var rowsAffectedAddress = connectionsql.Execute(sqlAddress, newRow);
                                     
-                                    var sqlPhones = "Delte from [TechChallenge1]..[ContactPhoneNumbers] where ContactId = @ContactId";
+                                    var sqlPhones = "delete from [TechChallenge1]..[ContactPhoneNumbers] where ContactId = @ContactId";
                                     var rowsAffectedPhones = connectionsql.Execute(sqlPhones, newRow);
                                 }
                             }
