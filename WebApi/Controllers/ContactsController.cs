@@ -171,14 +171,67 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> UpdateContactAsync([FromBody] ContactViewModel contactViewModel)
     {
+        Contact contact = new Contact();
+        //Contact Existe?
+
+        string urlApi = "https://localhost:7011/api/Contact/" + contactViewModel.ContactId;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+        contact = JsonSerializer.Deserialize<Contact>(conteudo, jsonOptions);
+
+        if (response.StatusCode == HttpStatusCode.NotFound) {
+            return NotFound("Contato não localizado");
+            
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+
         var resultValidation = await _contactAppService.UpdateAsync(contactViewModel);
 
         if (resultValidation.ValidationResults.Any())
             return BadRequest(resultValidation.ValidationResults);
         else
-            return resultValidation.Object is not null
-                ? Ok((ContactViewModel)resultValidation.Object)
-                : BadRequest("Falha ao alterar o contato...");
+        {
+            {
+                using var connection = _rabbitMqService.CreateChannel();
+
+                using (var model = connection.CreateModel())
+                {
+                    model.QueueDeclare(
+                    queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUpdateContact"),
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+
+                    var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<ContactViewModel>(contactViewModel));
+
+                    model.BasicPublish(exchange: "",
+                                 routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUpdateContact"),
+                                 mandatory: false,
+                                 basicProperties: null,
+                                 body: body
+                                 );
+                }
+                return Ok((ContactViewModel)resultValidation.Object);
+            }
+        }
+
+        //if (resultValidation.ValidationResults.Any())
+        //    return BadRequest(resultValidation.ValidationResults);
+        //else
+        //    return resultValidation.Object is not null
+        //        ? Ok((ContactViewModel)resultValidation.Object)
+        //        : BadRequest("Falha ao alterar o contato...");
     }
 
     /// <summary>
