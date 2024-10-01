@@ -28,7 +28,7 @@ namespace IntegrationTest
             );
 
             // Act
-            var response = await _httpClient.PostAsJsonAsync("/api/User", request);
+            var response = await _httpClient.PostAsJsonAsync("/api/IntegrationTest", request);
 
 
             // Assert
