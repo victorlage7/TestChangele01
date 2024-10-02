@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Prometheus;
 using WebApi;
 using WebApi.Infrastructure.Extensions;
 
@@ -35,6 +36,10 @@ startup.Configure(app, app.Environment);
 //Aplica migra��es a
 await app.MigrateDatabaseAsync();
 
+
+// Adicione o Prometheus middleware
+app.UseHttpMetrics();
+app.UseMetricServer(); // Exponha métricas na rota /metrics
 
 // Configure the HTTP request pipeline.
 app.MapControllers();

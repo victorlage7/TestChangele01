@@ -1,3 +1,4 @@
+using Prometheus;
 using UserServiceAPI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,10 @@ startup.ConfigureServices(builder.Services);
 var app = builder.Build();
 
 startup.Configure(app, app.Environment);
+
+// Adicione o Prometheus middleware
+app.UseHttpMetrics();
+app.UseMetricServer(); // Exponha métricas na rota /metrics
 
 app.MapControllers();
 
