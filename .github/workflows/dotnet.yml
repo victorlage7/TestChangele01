@@ -3,7 +3,9 @@ name: .NET
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: 
+      - main
+      - Modulo3
 
 jobs:
   build:
