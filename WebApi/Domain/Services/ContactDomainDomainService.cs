@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using WebApi.Domain.Entities;
+﻿using Core.Entities;
 using WebApi.Domain.Interfaces.Repositories;
 using WebApi.Domain.Interfaces.Services;
 
@@ -37,14 +36,16 @@ public class ContactDomainDomainService : IContactDomainService
                 ValidationResults = validationResults
             };
         }
-        else
-        {
-            await _contactRepository.AddAsync(contact);
-            return new ResultValidation
-            {
-                Object = contact
-            };
-        }
+        //else
+        //{
+        //    await _contactRepository.AddAsync(contact);
+        //    return new ResultValidation
+        //    {
+        //        Object = contact
+        //    };
+        //}
+
+        return null;
     }
 
     /// <summary>

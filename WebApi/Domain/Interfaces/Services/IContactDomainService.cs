@@ -1,5 +1,4 @@
-﻿using WebApi.Domain.Entities;
-using WebApi.Domain.Requests;
+﻿using Core.Entities;
 
 namespace WebApi.Domain.Interfaces.Services;
 

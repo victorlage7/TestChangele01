@@ -1,7 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Entities;
+using Core.Enums;
+using Messaging.Interface;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 using WebApi.Domain.Requests;
+using WebApi.Domain.ValueObjects;
 using WebApi.Interfaces;
 using WebApi.ViewModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApi.Controllers;
 
@@ -14,9 +22,15 @@ public class ContactsController : ControllerBase
 {
     private readonly IContactAppService _contactAppService;
 
-    public ContactsController(IContactAppService contactAppService)
+    private readonly IRabbitMqService _rabbitMqService;
+
+    private readonly IConfiguration _configuration;
+
+    public ContactsController(IContactAppService contactAppService, IConfiguration configuration, IRabbitMqService rabbitMqService)
     {
         _contactAppService = contactAppService;
+        _configuration = configuration;
+        _rabbitMqService = rabbitMqService;
     }
 
     /// <summary>
@@ -35,9 +49,38 @@ public class ContactsController : ControllerBase
         if (resultValidation.ValidationResults.Any())
             return BadRequest(resultValidation.ValidationResults);
         else
-            return resultValidation.Object is not null
-                ? Ok((ContactViewModel)resultValidation.Object)
-                : BadRequest("Falha ao incluir o contato...");
+        {
+            {
+                using var connection = _rabbitMqService.CreateChannel();
+
+                using (var model = connection.CreateModel())
+                {
+                    model.QueueDeclare(
+                    queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateContact"),
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+
+                    var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<ContactViewModel>(contactViewModel));
+
+                    model.BasicPublish(exchange: "",
+                                 routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameCreateContact"),
+                                 mandatory: false,
+                                 basicProperties: null,
+                                 body: body
+                                 );
+                }
+                return Ok((ContactViewModel)resultValidation.Object);
+            }
+        }
+
+        //if (resultValidation.ValidationResults.Any())
+        //    return BadRequest(resultValidation.ValidationResults);
+        //else
+        //    return resultValidation.Object is not null
+        //        ? Ok((ContactViewModel)resultValidation.Object)
+        //        : BadRequest("Falha ao incluir o contato...");
     }
 
     /// <summary>
@@ -57,6 +100,27 @@ public class ContactsController : ControllerBase
             return Ok(result);
 
         return NotFound("Contato não localizado");
+
+        //List<Contact> contacts = new List<Contact>();
+
+        //string urlApi = "https://localhost:7011/api/Contact/";
+        //var jsonOptions = new JsonSerializerOptions()
+        //{
+        //    PropertyNameCaseInsensitive = true
+        //};
+        //var client = new HttpClient();
+        //var response = await client.GetAsync(urlApi);
+
+        //var conteudo = await response.Content.ReadAsStringAsync();
+        //contacts = JsonSerializer.Deserialize<List<Contact>>(conteudo, jsonOptions);
+
+        //if (!response.IsSuccessStatusCode)
+        //{
+        //    return BadRequest("Tente novamente mais tarde.");
+        //}
+
+        //return Ok(contacts);
+
     }
 
     /// <summary>
@@ -70,12 +134,27 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 404)]
     public async Task<IActionResult> GetByContactIdAsync(Guid contactId)
     {
-        var result = await _contactAppService.GetByContactIdAsync(contactId);
+        string urlApi = "https://localhost:7011/api/Contact/"+contactId;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
 
-        if (result is not null)
-            return Ok(result);
+        var conteudo = await response.Content.ReadAsStringAsync();
+        var contact = JsonSerializer.Deserialize<dynamic>(conteudo, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        });
 
-        return NotFound("Contato não localizado");
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+
+        return Ok(contact);
     }
 
 
@@ -90,14 +169,67 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 400)]
     public async Task<IActionResult> UpdateContactAsync([FromBody] ContactViewModel contactViewModel)
     {
+        Contact contact = new Contact();
+        //Contact Existe?
+
+        string urlApi = "https://localhost:7011/api/Contact/" + contactViewModel.ContactId;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+        contact = JsonSerializer.Deserialize<Contact>(conteudo, jsonOptions);
+
+        if (response.StatusCode == HttpStatusCode.NotFound) {
+            return NotFound("Contato não localizado");
+            
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+
         var resultValidation = await _contactAppService.UpdateAsync(contactViewModel);
 
         if (resultValidation.ValidationResults.Any())
             return BadRequest(resultValidation.ValidationResults);
         else
-            return resultValidation.Object is not null
-                ? Ok((ContactViewModel)resultValidation.Object)
-                : BadRequest("Falha ao alterar o contato...");
+        {
+            {
+                using var connection = _rabbitMqService.CreateChannel();
+
+                using (var model = connection.CreateModel())
+                {
+                    model.QueueDeclare(
+                    queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUpdateContact"),
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+
+                    var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<ContactViewModel>(contactViewModel));
+
+                    model.BasicPublish(exchange: "",
+                                 routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameUpdateContact"),
+                                 mandatory: false,
+                                 basicProperties: null,
+                                 body: body
+                                 );
+                }
+                return Ok((ContactViewModel)resultValidation.Object);
+            }
+        }
+
+        //if (resultValidation.ValidationResults.Any())
+        //    return BadRequest(resultValidation.ValidationResults);
+        //else
+        //    return resultValidation.Object is not null
+        //        ? Ok((ContactViewModel)resultValidation.Object)
+        //        : BadRequest("Falha ao alterar o contato...");
     }
 
     /// <summary>
@@ -111,8 +243,56 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 404)]
     public async Task<IActionResult> DeleteContactAsync(Guid contactId)
     {
-        var result = await _contactAppService.DeleteAsync(contactId);
+        Contact contact = new Contact();
 
-        return result ? Ok("Contato excluído com sucesso...") : NotFound("Contato não localizado");
+        string urlApi = "https://localhost:7011/api/Contact/" + contactId;
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var client = new HttpClient();
+        var response = await client.GetAsync(urlApi);
+
+        var conteudo = await response.Content.ReadAsStringAsync();
+        contact = JsonSerializer.Deserialize<Contact>(conteudo, jsonOptions);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        { 
+            NotFound("Contato não localizado");
+        }
+        else if (!response.IsSuccessStatusCode)
+        {
+            return BadRequest("Tente novamente mais tarde.");
+        }
+        else
+        {
+            using var connection = _rabbitMqService.CreateChannel();
+
+            using (var model = connection.CreateModel())
+            {
+                model.QueueDeclare(
+                queue: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteContact"),
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(contact));
+
+                model.BasicPublish(exchange: "",
+                             routingKey: _configuration.GetSection("RabbitMqConfiguration").GetValue<string>("QueueNameDeleteContact"),
+                             mandatory: false,
+                             basicProperties: null,
+                             body: body
+                             );
+            }
+            return Ok("Usuário deletado com sucesso!");
+        }
+
+        return BadRequest("Tente novamente mais tarde.");
+
+        //var result = await _contactAppService.DeleteAsync(contactId);
+
+        //return result ? Ok("Contato excluído com sucesso...") : NotFound("Contato não localizado");
     }
 }

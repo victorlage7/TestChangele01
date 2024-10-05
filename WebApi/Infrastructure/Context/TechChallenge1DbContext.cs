@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApi.Domain.Entities;
-using WebApi.Domain.ValueObjects;
+﻿using Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Infrastructure.Context.Builders;
 
 namespace WebApi.Infrastructure.Context;

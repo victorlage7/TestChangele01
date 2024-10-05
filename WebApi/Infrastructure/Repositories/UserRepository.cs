@@ -1,7 +1,7 @@
+using Core.Dtos;
+using Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Interfaces.Repositories;
-using WebApi.Dtos;
 using WebApi.Infrastructure.Context;
 
 namespace WebApi.Infrastructure.Repositories;

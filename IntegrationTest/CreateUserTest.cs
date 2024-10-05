@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using WebApi.Domain.Entities;
-using System.Data;
 using FluentAssertions;
-using IntegrationTest.DTOs;
-using System.Text.Json;
+using Core.Entities;
 
 namespace IntegrationTest
 {
@@ -36,7 +28,7 @@ namespace IntegrationTest
             );
 
             // Act
-            var response = await _httpClient.PostAsJsonAsync("/api/User", request);
+            var response = await _httpClient.PostAsJsonAsync("/api/IntegrationTest", request);
 
 
             // Assert

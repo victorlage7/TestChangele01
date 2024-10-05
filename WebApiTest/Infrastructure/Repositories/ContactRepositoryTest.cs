@@ -1,9 +1,9 @@
 using Moq;
 using WebApi.Infrastructure.Context;
-using WebApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Infrastructure.Repositories;
 using WebApi.Domain.Requests;
+using Core.Entities;
 
 namespace WebApiTest.Controllers;
 

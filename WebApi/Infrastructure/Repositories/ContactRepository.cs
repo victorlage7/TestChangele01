@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApi.Domain.Entities;
+﻿using Core.Entities;
 using WebApi.Domain.Interfaces.Repositories;
 using WebApi.Domain.Requests;
 using WebApi.Infrastructure.Context;

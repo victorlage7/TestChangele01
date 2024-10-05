@@ -1,4 +1,4 @@
-using WebApi.Domain.Enums;
+using Core.Enums;
 
 namespace WebApi.ViewModels;
 

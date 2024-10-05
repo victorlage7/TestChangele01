@@ -1,6 +1,6 @@
+using Core.Entities;
 using System.ComponentModel.DataAnnotations;
 using WebApi.Domain;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Interfaces.Repositories;
 using WebApi.Domain.Interfaces.Services;
 using WebApi.Domain.Requests;
@@ -89,15 +89,15 @@ public class ContactAppService : IContactAppService
 
         var resulValidation = await _contactDomainService.AddAsync(newContact);
 
-        if (resulValidation.Object is null) return resulValidation;
+        if (resulValidation is not null && resulValidation.Object is null) return resulValidation;
 
-        var contact = (Contact)resulValidation.Object;
+        //var contact = (Contact)resulValidation.Object;
 
-        var newContactViewModel = new ContactViewModel(contactId: contact.ContactId, name: contact.Name,
-            phoneNumbers: contact.PhoneNumbers.Select(phone =>
+        var newContactViewModel = new ContactViewModel(contactId: newContact.ContactId, name: newContact.Name,
+            phoneNumbers: newContact.PhoneNumbers.Select(phone =>
                 new PhoneNumberViewModel(type: phone.Type, countryCode: phone.CountryCode,
                     areaCode: phone.AreaCode, number: phone.Number)),
-            emailAddresses: contact.EmailAddresses.Select(email =>
+            emailAddresses: newContact.EmailAddresses.Select(email =>
                 new EmailAddressViewModel(type: email.Type, address: email.Address)));
 
         return new ResultValidation
@@ -113,81 +113,83 @@ public class ContactAppService : IContactAppService
     /// <returns></returns>
     public async Task<ResultValidation> UpdateAsync(ContactViewModel contactViewModel)
     {
-        var contact = await _contactRepository.GetByContactIdAsync(contactViewModel.ContactId);
 
-        if (contact == null)
-            return new ResultValidation()
-            {
-                ValidationResults = new List<ValidationResult>
-                    { new("Contato não localizado") }
-            };
+         return await AddAsync(contactViewModel);
+        //var contact = await _contactRepository.GetByContactIdAsync(contactViewModel.ContactId);
 
-        contact.Update(contactViewModel.Name);
+        //if (contact == null)
+        //    return new ResultValidation()
+        //    {
+        //        ValidationResults = new List<ValidationResult>
+        //            { new("Contato não localizado") }
+        //    };
 
-        if (contactViewModel.PhoneNumbers.Any())
-        {
-            foreach (var phoneNumber in contact.PhoneNumbers)
-            {
-                if (!contactViewModel.PhoneNumbers.Any(x =>
-                        x.Type == phoneNumber.Type
-                        && x.CountryCode == phoneNumber.CountryCode
-                        && x.AreaCode == phoneNumber.AreaCode
-                        && x.Number == phoneNumber.Number))
-                    contact.RemovePhoneNumber(phoneNumber);
+        //contact.Update(contactViewModel.Name);
 
-                ;
-            }
+        //if (contactViewModel.PhoneNumbers.Any())
+        //{
+        //    foreach (var phoneNumber in contact.PhoneNumbers)
+        //    {
+        //        if (!contactViewModel.PhoneNumbers.Any(x =>
+        //                x.Type == phoneNumber.Type
+        //                && x.CountryCode == phoneNumber.CountryCode
+        //                && x.AreaCode == phoneNumber.AreaCode
+        //                && x.Number == phoneNumber.Number))
+        //            contact.RemovePhoneNumber(phoneNumber);
 
-            foreach (var phoneViewModel in contactViewModel.PhoneNumbers)
-                contact.AddPhoneNumber(new PhoneNumber(phoneViewModel.Type,
-                    phoneViewModel.CountryCode,
-                    phoneViewModel.AreaCode,
-                    phoneViewModel.Number));
-        }
-        else
-        {
-            contact.RemoveAllPhoneNumber();
-        }
+        //        ;
+        //    }
+
+        //    foreach (var phoneViewModel in contactViewModel.PhoneNumbers)
+        //        contact.AddPhoneNumber(new PhoneNumber(phoneViewModel.Type,
+        //            phoneViewModel.CountryCode,
+        //            phoneViewModel.AreaCode,
+        //            phoneViewModel.Number));
+        //}
+        //else
+        //{
+        //    contact.RemoveAllPhoneNumber();
+        //}
 
 
-        if (contactViewModel.EmailAddresses.Any())
-        {
-            foreach (var email in contact.EmailAddresses)
-            {
-                if (!contactViewModel.EmailAddresses.Any(x =>
-                        x.Type == email.Type
-                        && x.Address == email.Address))
-                    contact.RemoveEmailAddress(email);
+        //if (contactViewModel.EmailAddresses.Any())
+        //{
+        //    foreach (var email in contact.EmailAddresses)
+        //    {
+        //        if (!contactViewModel.EmailAddresses.Any(x =>
+        //                x.Type == email.Type
+        //                && x.Address == email.Address))
+        //            contact.RemoveEmailAddress(email);
 
-                ;
-            }
+        //        ;
+        //    }
 
-            foreach (var email in contactViewModel.EmailAddresses)
-                contact.AddEmailAddress(new EmailAddress(email.Type,
-                    email.Address));
-        }
-        else
-        {
-            contact.RemoveAllEmailAddress();
-        }
+        //    foreach (var email in contactViewModel.EmailAddresses)
+        //        contact.AddEmailAddress(new EmailAddress(email.Type,
+        //            email.Address));
+        //}
+        //else
+        //{
+        //    contact.RemoveAllEmailAddress();
+        //}
 
-        var resulValidation = await _contactDomainService.UpdateAsync(contact);
+        //var resulValidation = await _contactDomainService.UpdateAsync(contact);
 
-        if (resulValidation.Object is null) return resulValidation;
+        //if (resulValidation.Object is null) return resulValidation;
 
-        contact = (Contact)resulValidation.Object;
+        //contact = (Contact)resulValidation.Object;
 
-        var updContactViewModel = new ContactViewModel(contactId: contact.ContactId, name: contact.Name,
-            phoneNumbers: contact.PhoneNumbers.Select(phone =>
-                new PhoneNumberViewModel(type: phone.Type, countryCode: phone.CountryCode,
-                    areaCode: phone.AreaCode, number: phone.Number)),
-            emailAddresses: contact.EmailAddresses.Select(email =>
-                new EmailAddressViewModel(type: email.Type, address: email.Address)));
+        //var updContactViewModel = new ContactViewModel(contactId: contact.ContactId, name: contact.Name,
+        //    phoneNumbers: contact.PhoneNumbers.Select(phone =>
+        //        new PhoneNumberViewModel(type: phone.Type, countryCode: phone.CountryCode,
+        //            areaCode: phone.AreaCode, number: phone.Number)),
+        //    emailAddresses: contact.EmailAddresses.Select(email =>
+        //        new EmailAddressViewModel(type: email.Type, address: email.Address)));
 
-        return new ResultValidation
-        {
-            Object = updContactViewModel
-        };
+        //return new ResultValidation
+        //{
+        //    Object = updContactViewModel
+        //};
     }
 
     /// <summary>

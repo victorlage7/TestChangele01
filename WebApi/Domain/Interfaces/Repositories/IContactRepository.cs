@@ -1,4 +1,4 @@
-﻿using WebApi.Domain.Entities;
+﻿using Core.Entities;
 using WebApi.Domain.Requests;
 
 namespace WebApi.Domain.Interfaces.Repositories;
