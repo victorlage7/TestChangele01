@@ -27,6 +27,14 @@ namespace Core.Entities
             PhoneNumbers = new HashSet<PhoneNumber>();
         }
 
+        public Contact(string name, Guid guid)
+        {
+            Name = name;
+            ContactId = guid;
+            EmailAddresses = new HashSet<EmailAddress>();
+            PhoneNumbers = new HashSet<PhoneNumber>();
+        }
+
         /// <summary>
         /// Identificador do contato.
         /// </summary>

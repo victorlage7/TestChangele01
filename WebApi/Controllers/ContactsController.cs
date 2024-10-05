@@ -1,12 +1,15 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using Messaging.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using WebApi.Domain.Requests;
+using WebApi.Domain.ValueObjects;
 using WebApi.Interfaces;
 using WebApi.ViewModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApi.Controllers;
 
@@ -131,15 +134,6 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(typeof(string), 404)]
     public async Task<IActionResult> GetByContactIdAsync(Guid contactId)
     {
-        //var result = await _contactAppService.GetByContactIdAsync(contactId);
-
-        //if (result is not null)
-        //    return Ok(result);
-
-        //return NotFound("Contato não localizado");
-
-        Contact contact = new Contact();
-
         string urlApi = "https://localhost:7011/api/Contact/"+contactId;
         var jsonOptions = new JsonSerializerOptions()
         {
@@ -149,7 +143,11 @@ public class ContactsController : ControllerBase
         var response = await client.GetAsync(urlApi);
 
         var conteudo = await response.Content.ReadAsStringAsync();
-        contact = JsonSerializer.Deserialize<Contact>(conteudo, jsonOptions);
+        var contact = JsonSerializer.Deserialize<dynamic>(conteudo, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        });
 
         if (!response.IsSuccessStatusCode)
         {
