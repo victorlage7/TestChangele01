@@ -14,7 +14,7 @@ public class UserRepository : IUserRepository
     private readonly TechChallenge1DbContext _context;
     
     /// <summary>
-    /// Ciando uma nova instância de <see cref="UserRepository"/>.
+    /// Criando uma nova instância de <see cref="UserRepository"/>.
     /// </summary>
     /// <param name="context">DbContext</param>
     public UserRepository(TechChallenge1DbContext context)

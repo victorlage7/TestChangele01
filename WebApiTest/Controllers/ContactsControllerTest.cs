@@ -9,15 +9,16 @@ using System.ComponentModel.DataAnnotations;
 using Core.Enums;
 using Messaging.Interface;
 using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
 
 namespace WebApiTest.Controllers;
 
 public class ContactsControllerTest
 {
     private Mock<IContactAppService> _contactAppServiceMock;
-    private readonly IRabbitMqService _rabbitMqService;
+    private Mock<IRabbitMqService> _rabbitMqServiceMock;
 
-    private readonly IConfiguration _configuration;
+    private IConfiguration _configuration;
 
     private ContactsController _controllerMock;
     private readonly ContactViewModel _invalidContactViewModel = new();
@@ -37,7 +38,19 @@ public class ContactsControllerTest
     public void Setup()
     {
         _contactAppServiceMock = new Mock<IContactAppService>();
-        _controllerMock = new ContactsController(_contactAppServiceMock.Object, _configuration, _rabbitMqService);
+        _rabbitMqServiceMock = new Mock<IRabbitMqService>();
+
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            {"RabbitMqConfiguration:QueueNameCreateContact", "queue"},
+            {"RabbitMqConfiguration:QueueNameUpdateContact", "queue"},
+            {"RabbitMqConfiguration:QueueNameDeleteContact", "queue"}
+        };
+        _configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+
+        _controllerMock = new ContactsController(_contactAppServiceMock.Object, _configuration, _rabbitMqServiceMock.Object);
     }
 
     [Test]
@@ -81,6 +94,27 @@ public class ContactsControllerTest
         // Assert
         Assert.That(badRequestResult, Is.Not.Null);
         Assert.That(badRequestResult.StatusCode, Is.EqualTo(400));
+    }
+
+    [Test]
+    public async Task CreateContact_ShouldReturnOk()
+    {
+        // Arrange
+        var connectionMock = new Mock<IConnection>();
+        var modelMock = new Mock<IModel>();
+        connectionMock.Setup(c => c.CreateModel()).Returns(modelMock.Object);
+        _rabbitMqServiceMock.Setup(r => r.CreateChannel()).Returns(connectionMock.Object);
+
+        _contactAppServiceMock.Setup(x => x.AddAsync(_contactViewModel))
+            .ReturnsAsync(new ResultValidation { Object = _contactViewModel });
+
+        // Act
+        var result = await _controllerMock.AddContactAsync(_contactViewModel);
+        var okResult = result as OkObjectResult;
+
+        // Assert
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult.StatusCode, Is.EqualTo(200));
     }
 
     [Test]
