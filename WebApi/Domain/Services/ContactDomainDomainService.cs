@@ -69,8 +69,6 @@ public class ContactDomainDomainService : IContactDomainService
                 Object = contact
             };
         }
-
-        ;
     }
     
     /// <summary>
